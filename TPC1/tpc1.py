@@ -12,13 +12,13 @@ def load_data(path):
 
     data = list()
     bounds = {
-        "age" : {
-            "max" : float('-inf'),
-            "min" : float('inf')
+        "age": {
+            "max": float('-inf'),
+            "min": float('inf')
         },
         "cholesterol": {
-            "max" : float('-inf'),
-            "min" : float('inf')
+            "max": float('-inf'),
+            "min": float('inf')
         }
     }
 
@@ -58,13 +58,13 @@ def load_data(path):
 
 def distribution_by_gender(data):
     res = {
-        "M" : {
-            False : 0,
+        "M": {
+            False: 0,
             True: 0
         },
-        "F" : {
-            False : 0,
-            True : 0
+        "F": {
+            False: 0,
+            True: 0
         }
     }
 
@@ -76,18 +76,21 @@ def distribution_by_gender(data):
 
 def distribution_by_age(data):
     max = data.bounds["age"]["max"]
+    min = data.bounds["age"]["min"]
 
     res = dict()    
-    for i in range(0,(max//5)+1):
-        res[(i*5, i*5 + 4)] = {
-            False : 0,
-            True : 0
+    for i in range(min//5, (max//5)+1):
+        key = f"[{i*5},{i*5 + 4}]"
+        res[key] = {
+            False: 0,
+            True: 0
         }
     
     for person in data.data:
         lower_bound = (person.age//5)*5
         upper_bound = lower_bound + 4
-        res[(lower_bound, upper_bound)][person.disease] += 1
+        key = f"[{lower_bound},{upper_bound}]"
+        res[key][person.disease] += 1
 
     return res
 
@@ -98,16 +101,17 @@ def distribution_by_cholesterol(data):
 
     res = dict()
     for i in range(min//10, (max//10)+1):
-        res[(i*10, i*10 + 9)] = {
-            False : 0,
-
-            True : 0
+        key = f"[{i*10},{i*10 + 9}]"
+        res[key] = {
+            False: 0,
+            True: 0
         }
 
     for person in data.data:
         lower_bound = (person.cholesterol//10)*10
         upper_bound = lower_bound + 9
-        res[(lower_bound, upper_bound)][person.disease] += 1
+        key = f"[{lower_bound},{upper_bound}]"
+        res[key][person.disease] += 1
 
     return res
 
@@ -128,23 +132,30 @@ def distribution_to_table(distribution):
             print("{:{}}".format(table[i][j], larguras[j]), end="  ")
         print()
 
-def distribution_to_graph(distribution):
+def distribution_to_graph(distribution, flag):
     x_axis = np.arange(len(distribution.keys()))
     x_coordinates = [str(elem) for elem in distribution.keys()]
     y_cd = [elem[True] for elem in distribution.values()]
     y_sd = [elem[False] for elem in distribution.values()]
 
-    plt.figure(figsize=[19, 9])
+    plt.figure(figsize=[12, 9])
 
-    plt.bar(x_axis - 0.2, y_cd, label="Com doença", tick_label=x_coordinates, width=0.4)
-    plt.bar(x_axis + 0.2, y_sd, label="Sem doença", tick_label=x_coordinates, width=0.4)
+    plt.barh(x_axis - 0.2, y_cd, label="Com doença", tick_label=x_coordinates, height=0.4, color="salmon")
+    plt.barh(x_axis + 0.2, y_sd, label="Sem doença", tick_label=x_coordinates, height=0.4, color="lightgreen")
 
-    plt.xticks(x_axis, distribution.keys())
-    plt.ylabel("Frequência")
-    plt.title("Distribuição")
+    plt.yticks(x_axis, distribution.keys())
+    plt.xlabel("Frequência")
+
+    match flag:
+        case 0:
+            plt.title("Distribuição por género")
+        case 1:
+            plt.title("Distribuição por idade")
+        case 2:
+            plt.title("Distribuição por colesterol")
+
     plt.legend()
     plt.show()
-
 
 
 csv_path = input("Path do ficheiro CSV:\n")
@@ -176,7 +187,7 @@ while option != 4:
                 case 1:
                     distribution_to_table(distribution_by_gender(data))
                 case 2:
-                    distribution_to_graph(distribution_by_gender(data))
+                    distribution_to_graph(distribution_by_gender(data), 0)
                 case _:
                     print("Opção inválida!")
         case 2:
@@ -190,7 +201,7 @@ while option != 4:
                 case 1:
                     distribution_to_table(distribution_by_age(data))
                 case 2:
-                    distribution_to_graph(distribution_by_age(data))
+                    distribution_to_graph(distribution_by_age(data), 1)
                 case _:
                     print("Opção inválida!")
         case 3:
@@ -204,7 +215,7 @@ while option != 4:
                 case 1:
                     distribution_to_table(distribution_by_cholesterol(data))
                 case 2:
-                    distribution_to_graph(distribution_by_cholesterol(data))
+                    distribution_to_graph(distribution_by_cholesterol(data), 2)
                 case _:
                     print("Opção inválida!")
         case 4:
