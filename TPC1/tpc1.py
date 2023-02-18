@@ -1,6 +1,9 @@
-from validator import *
-from person import *
 from data import *
+from person import *
+from validator import *
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 def load_data(path):
     file = open(path)
@@ -97,6 +100,7 @@ def distribution_by_cholesterol(data):
     for i in range(min//10, (max//10)+1):
         res[(i*10, i*10 + 9)] = {
             False : 0,
+
             True : 0
         }
 
@@ -124,11 +128,88 @@ def distribution_to_table(distribution):
             print("{:{}}".format(table[i][j], larguras[j]), end="  ")
         print()
 
+def distribution_to_graph(distribution):
+    x_axis = np.arange(len(distribution.keys()))
+    x_coordinates = [str(elem) for elem in distribution.keys()]
+    y_cd = [elem[True] for elem in distribution.values()]
+    y_sd = [elem[False] for elem in distribution.values()]
+
+    plt.figure(figsize=[19, 9])
+
+    plt.bar(x_axis - 0.2, y_cd, label="Com doença", tick_label=x_coordinates, width=0.4)
+    plt.bar(x_axis + 0.2, y_sd, label="Sem doença", tick_label=x_coordinates, width=0.4)
+
+    plt.xticks(x_axis, distribution.keys())
+    plt.ylabel("Frequência")
+    plt.title("Distribuição")
+    plt.legend()
+    plt.show()
 
 
-data = load_data("myheart.csv")
-#print(len(data.data))
-#print(data.bounds)
 
-#print(distribution_by_gender(data))
-#distribution_to_table(distribution_by_cholesterol(data))
+csv_path = input("Path do ficheiro CSV:\n")
+data = load_data(csv_path)
+print("Dados carregados!")
+
+option = 0
+
+while option != 4:
+    print("------------------------------------------")
+    print("Qual distribuição pretende visualizar?")
+    print("1 - Distribuição por género")
+    print("2 - Distribuição por idade")
+    print("3 - Distribuição por colesterol")
+    print("4 - Sair")
+    print("------------------------------------------")
+
+    option = int(input())
+
+    match option:
+        case 1:
+            print("------------------------------------------")
+            print("1 - Formato tabular")
+            print("2 - Formato gráfico")
+            print("------------------------------------------")
+            format = int(input())
+
+            match format:
+                case 1:
+                    distribution_to_table(distribution_by_gender(data))
+                case 2:
+                    distribution_to_graph(distribution_by_gender(data))
+                case _:
+                    print("Opção inválida!")
+        case 2:
+            print("------------------------------------------")
+            print("1 - Formato tabular")
+            print("2 - Formato gráfico")
+            print("------------------------------------------")
+            format = int(input())
+
+            match format:
+                case 1:
+                    distribution_to_table(distribution_by_age(data))
+                case 2:
+                    distribution_to_graph(distribution_by_age(data))
+                case _:
+                    print("Opção inválida!")
+        case 3:
+            print("------------------------------------------")
+            print("1 - Formato tabular")
+            print("2 - Formato gráfico")
+            print("------------------------------------------")
+            format = int(input())
+
+            match format:
+                case 1:
+                    distribution_to_table(distribution_by_cholesterol(data))
+                case 2:
+                    distribution_to_graph(distribution_by_cholesterol(data))
+                case _:
+                    print("Opção inválida!")
+        case 4:
+            print("A sair...")
+        case _:
+            print("Opção inválida!")
+
+
