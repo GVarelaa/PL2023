@@ -1,8 +1,8 @@
 class Person:
-    def __init__(self, idade, sexo, tensao, colesterol, batimento, doenca):
-        self.age = idade
-        self.gender = sexo
-        self.tension = tensao
-        self.cholesterol = colesterol
-        self.pulse = batimento
-        self.disease = doenca
+    def __init__(self, age, gender, tension, cholesterol, pulse, disease):
+        self.age = age
+        self.gender = gender
+        self.tension = tension
+        self.cholesterol = cholesterol
+        self.pulse = pulse
+        self.disease = disease
