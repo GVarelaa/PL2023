@@ -1,5 +1,4 @@
 from data import *
-from person import *
 from validator import *
 import matplotlib.pyplot as plt
 import numpy as np
@@ -143,10 +142,12 @@ def distribution_to_graph(distribution, flag):
     plt.xlabel("Frequência")
 
     for i, v in enumerate(y_cd):
-        plt.text(v, i - 0.2, " " + str(v), color='black', va='center', fontsize='xx-small')
+        if v != 0:
+            plt.text(v, i - 0.2, " " + str(v), color='black', va='center', fontsize='xx-small')
 
     for i, v in enumerate(y_sd):
-        plt.text(v, i + 0.2, " " + str(v), color='black', va='center', fontsize='xx-small')
+        if v != 0:
+            plt.text(v, i + 0.2, " " + str(v), color='black', va='center', fontsize='xx-small')
 
     match flag:
         case 0:
