@@ -142,6 +142,12 @@ def distribution_to_graph(distribution, flag):
     plt.yticks(x_axis, distribution.keys())
     plt.xlabel("Frequência")
 
+    for i, v in enumerate(y_cd):
+        plt.text(v, i - 0.2, " " + str(v), color='black', va='center', fontsize='xx-small')
+
+    for i, v in enumerate(y_sd):
+        plt.text(v, i + 0.2, " " + str(v), color='black', va='center', fontsize='xx-small')
+
     match flag:
         case 0:
             plt.title("Distribuição por género")
