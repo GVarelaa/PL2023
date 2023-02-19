@@ -8,7 +8,7 @@ import numpy as np
 def load_data(path):
     file = open(path)
     f = file.readlines()
-    f.pop(0) # tirar a primeira linha do comentario
+    f.pop(0)
 
     data = list()
     bounds = {
@@ -117,20 +117,16 @@ def distribution_by_cholesterol(data):
 
 
 def distribution_to_table(distribution):
-    table = [["", "Com doença", "Sem doença"]]
-    
-    for key in distribution.keys():
-        table += [[str(key), str(distribution[key][True]), str(distribution[key][False])]]
+    keys = list(distribution.keys())
 
-    num_colunas = len(table[0])
-    num_linhas = len(table)
+    table = "          | Com doença | Sem doença |\n"
+    for i in range(len(keys)):
+        table += ' ' * (9 - len(keys[i])) + f"{keys[i]} |"
+        table += ' ' * (11 - len(str(distribution[keys[i]][True]))) + f"{distribution[keys[i]][True]} |"
+        table += ' ' * (11 - len(str(distribution[keys[i]][False]))) + f"{distribution[keys[i]][False]} |\n"
 
-    larguras = [max(len(table[i][j]) for i in range(num_linhas)) for j in range(num_colunas)]
+    print(table)
 
-    for i in range(num_linhas):
-        for j in range(num_colunas):
-            print("{:{}}".format(table[i][j], larguras[j]), end="  ")
-        print()
 
 def distribution_to_graph(distribution, flag):
     x_axis = np.arange(len(distribution.keys()))
