@@ -13,7 +13,7 @@ def main():
     linha = input(">>> ")
     while linha != "":
         linha = linha.upper()
-
+        linha += '\n'
         for ind, char in enumerate(linha):
             if estado:
                 if char.isdigit():
