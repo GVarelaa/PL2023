@@ -9,40 +9,30 @@ def main():
     soma = 0
     estado = True
     num_string = ""
-    estado_string = ""
 
-    linha = input(">")
+    linha = input(">>> ")
     while linha != "":
-        for c in linha:
-            c = c.upper()
+        linha = linha.upper()
 
+        for ind, char in enumerate(linha):
             if estado:
-                if '0' <= c <= '9':
-                    num_string += c
-                elif len(num_string) != 0:
-                    soma += int(num_string)
-                    num_string = ""   
-            
-            match c:
-                case 'O':
-                    estado_string = c
-                case 'N':
-                    if estado_string == "O":
-                        estado = True
-                        estado_string = ""
-                case 'F':
-                    if estado_string == "O":
-                        estado_string += c
-                    elif estado_string == "OF":
+                if char.isdigit():
+                    num_string += char
+                else:
+                    if char == 'O' and linha[ind : ind+3] == "OFF":
                         estado = False
-                        estado_string = ""
-                case '=':
-                    print_soma(soma)
-                    estado_string = ""
-                case other:
-                    estado_string = ""
+                    
+                    if len(num_string) != 0:
+                        soma += int(num_string)
+                        num_string = ""  
+            else:
+                if char == 'O' and linha[ind : ind+2] == "ON":
+                    estado = True
+
+            if char == '=':
+                print_soma(soma)
         
-        linha = input(">")
+        linha = input(">>> ")
 
 
 if __name__ == '__main__':
