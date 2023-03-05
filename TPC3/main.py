@@ -107,19 +107,21 @@ def processes_to_json(data, path):
 
 def main():
     file = open("processos.txt")
-    regex = re.compile(r"(?P<folder>\d+)::(?P<year>\d{4})\-(?P<month>\d{2})-(?P<day>\d{2})::(?P<name>[A-Za-z ]+)::(?P<f_name>[A-Za-z ]+)::(?P<m_name>[A-Za-z ]+)::(?P<obs>.*)::")
-    matches = regex.finditer(file.read())   
+    line_exp = re.compile(r"(?P<folder>\d+)::(?P<year>\d{4})\-(?P<month>\d{2})-(?P<day>\d{2})::(?P<name>[A-Za-z ]+)::(?P<f_name>[A-Za-z ]+)::(?P<m_name>[A-Za-z ]+)::(?P<obs>.*)::")
+    obs_exp = re.compile(r"Doc.danificado.")
+    matches = line_exp.finditer(file.read())   
 
     processes = dict()
     valid_processes = list()
-    # Filtra linhas iguais
+
+    # Filtra linhas iguais e documentos danificados
     for match in matches:
-        if match["folder"] in processes:
-            temp_processes = processes[match["folder"]]
-            if match.groupdict() not in temp_processes:
-                processes[match["folder"]].append(match.groupdict())
-        else:
-            processes[match["folder"]] = [match.groupdict()]
+        if not obs_exp.search(match.group("obs")):
+            if match["folder"] in processes:
+                if match.groupdict() not in processes[match["folder"]]:
+                    processes[match["folder"]].append(match.groupdict())
+            else:
+                processes[match["folder"]] = [match.groupdict()]
     
     for value in processes.values():
         valid_processes += value
