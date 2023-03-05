@@ -85,14 +85,16 @@ def names_per_century(data):
 def relationshiop_frequency(data):
     relationship = dict()
 
+    exp = re.compile(r"[a-zA-Z ]*,([a-zA-Z\s]*)\.[ ]*Proc\.\d+\.")
+
     for process in data:
         obs = process["obs"]
-        if match := re.search(r"(?i)[a-zA-Z ],([A-Z][a-zA-Z ]*)\.", obs):
-            relation = match.group(1)
-            
-            if relation not in relationship:
-                relationship[relation] = 0
-            relationship[relation] += 1
+        matches = exp.finditer(obs)
+
+        for match in matches:
+            if match.group(1) not in relationship:
+                relationship[match.group(1)] = 0
+            relationship[match.group(1)] += 1
     
     return relationship
 
@@ -106,11 +108,21 @@ def processes_to_json(data, path):
 def main():
     file = open("processos.txt")
     regex = re.compile(r"(?P<folder>\d+)::(?P<year>\d{4})\-(?P<month>\d{2})-(?P<day>\d{2})::(?P<name>[A-Za-z ]+)::(?P<f_name>[A-Za-z ]+)::(?P<m_name>[A-Za-z ]+)::(?P<obs>.*)::")
+    matches = regex.finditer(file.read())   
 
-    valid_lines = list()
-    matches = regex.finditer(file.read())
+    processes = dict()
+    valid_processes = list()
+    # Filtra linhas iguais
     for match in matches:
-        valid_lines.append(match.groupdict())
+        if match["folder"] in processes:
+            temp_processes = processes[match["folder"]]
+            if match.groupdict() not in temp_processes:
+                processes[match["folder"]].append(match.groupdict())
+        else:
+            processes[match["folder"]] = [match.groupdict()]
+    
+    for value in processes.values():
+        valid_processes += value
 
     option = 0
     while option != 5:
@@ -126,17 +138,17 @@ def main():
 
         match option:
             case 1:
-                print_dict(processes_per_year(valid_lines))
+                print_dict(processes_per_year(valid_processes))
 
             case 2:
-                first_names, last_names = names_per_century(valid_lines)
+                first_names, last_names = names_per_century(valid_processes)
                 most_used_names_per_sec(first_names, last_names)
             case 3:
-                print_dict(relationshiop_frequency(valid_lines))
+                print_dict(relationshiop_frequency(valid_processes))
             case 4:
                 print("Nome do ficheiro:")
                 path = input()
-                processes_to_json(valid_lines, path)
+                processes_to_json(valid_processes, path)
             case 5:
                 print("A sair...")
             case _:
