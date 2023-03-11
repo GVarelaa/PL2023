@@ -3,14 +3,11 @@ import json
 from statistics import mean
 
 def main():
-    file = open("alunos5.csv")
-    lines = file.readlines()
-    file.close()
-
-
+    with open("alunos5.csv") as file:
+        lines = file.readlines()
+    
     header_re = re.compile(r"([^,{]+)(?:\{(\d+)(?:,(\d+))?\}(?:::(\w+))?)?[,]?")
     header_fields = header_re.findall(lines[0].strip())
-
 
     # Estruturas do cabeçalho
     header = []
@@ -53,7 +50,7 @@ def main():
         matches = body_re.finditer(line.strip())
         data += [match.groupdict() for match in matches]
     
-
+    
     # Tratar a lista de dicionarios para inserir as listas e funcões de agregaçao
     for elem in data:
         for field in header:
@@ -67,9 +64,8 @@ def main():
                     elem[field] = mean(elem[field])
 
 
-    json_file = open("alunos5.json", "w")
-    json.dump(data, json_file, indent=len(header), ensure_ascii=False)
-    json_file.close()   
+    with open("alunos5.json", "w") as json_file:
+        json.dump(data, json_file, indent=len(header), ensure_ascii=False)    
 
 
 if __name__ == '__main__':
