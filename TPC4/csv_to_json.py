@@ -3,67 +3,71 @@ import json
 from statistics import mean
 
 def main():
-    file_name = input("Indique o nome do ficheiro:\n")
-
-    file = open(file_name+".csv")
+    file = open("alunos5.csv")
     lines = file.readlines()
     file.close()
 
-    regex_header = re.compile(r"([^,{]+)(\{(\d+)(,(\d+))?\}(::(\w+))?)?[,]?")
-    header_fields = regex_header.findall(lines[0].strip())
 
+    header_re = re.compile(r"([^,{]+)(?:\{(\d+)(?:,(\d+))?\}(?:::(\w+))?)?[,]?")
+    header_fields = header_re.findall(lines[0].strip())
+
+
+    # Estruturas do cabeçalho
     header = []
     lists = dict()
-    aggregate = dict()
+    aggregates = dict()
     for i in range(0, len(header_fields)):
-        field_name = header_fields[i][0]
-        header.append(field_name)
+        field = header_fields[i][0]
+        quantity1 = header_fields[i][1]
+        quantity2 = header_fields[i][2]
+        aggregate = header_fields[i][3]
 
-        if header_fields[i][6] != '':
-            aggregate[field_name] = header_fields[i][6]
-            lists[field_name] = (header_fields[i][2], header_fields[i][4])
-        elif header_fields[i][2] != '':
-            lists[field_name] = (header_fields[i][2], header_fields[i][4])
+        header.append(field)
+
+        if aggregate != '':
+            lists[field] = (quantity1, quantity2)
+            aggregates[field] = aggregate
+        elif quantity1 != '':
+            lists[field] = (quantity1, quantity2)
 
 
     #Construir expressão
-    regex = ""
-    for field_name in header:
-        if field_name in lists:
-            if lists[field_name][1] != '':
-                str_range = f"{{{int(lists[field_name][0])},{int(lists[field_name][1])}}}"
+    body_re = ""
+    for field in header:
+        if field in lists:
+            if lists[field][1] != '':
+                quantity = f"{{{int(lists[field][0])},{int(lists[field][1])}}}"
             else:
-                str_range = f"{{{int(lists[field_name][0])}}}"
+                quantity = f"{{{int(lists[field][0])}}}"
 
-            regex += rf"(?P<{field_name}>([^,]+[,]?){str_range})[,]?"
+            body_re += rf"(?P<{field}>([^,]+[,]?){quantity})[,]?"
         else:
-            regex += rf"(?P<{field_name}>[^,]+)[,]?"
+            body_re += rf"(?P<{field}>[^,]+)[,]?"
 
-    regex = re.compile(regex)
+    body_re = re.compile(body_re)
+
 
     # Meter a informação em dicionarios com a expressao regex
     data = list()
-    lines = lines[1:]
-    for line in lines:
-        matches = regex.finditer(line.strip())
+    for line in lines[1:]:
+        matches = body_re.finditer(line.strip())
+        data += [match.groupdict() for match in matches]
+    
 
-        for match in matches:
-            data.append(match.groupdict())
-
-    # Tratar a lista de dicionarios para inserir as listas e funcoes de agregaçao
+    # Tratar a lista de dicionarios para inserir as listas e funcões de agregaçao
     for elem in data:
-        for field_name in header:
-            if field_name in lists:
-                elem[field_name] = [int(num) for num in re.findall(r"\d+", elem[field_name])]
+        for field in header:
+            if field in lists:
+                elem[field] = [int(num) for num in re.findall(r"\d+", elem[field])]
             
-            if field_name in aggregate:
-                if aggregate[field_name] == "sum":
-                    elem[field_name] = sum(elem[field_name])
-                elif aggregate[field_name] == "media":
-                    elem[field_name] = mean(elem[field_name])
+            if field in aggregates:
+                if aggregates[field] == "sum":
+                    elem[field] = sum(elem[field])
+                elif aggregates[field] == "media":
+                    elem[field] = mean(elem[field])
 
 
-    json_file = open(file_name+".csv", "w")
+    json_file = open("alunos5.json", "w")
     json.dump(data, json_file, indent=len(header), ensure_ascii=False)
     json_file.close()   
 
