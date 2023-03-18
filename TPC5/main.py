@@ -52,10 +52,9 @@ def pousar():
 
 
 def moeda(line):
-    values = re.split(r"\s*,\s*", line[6:][:-1])
     invalid_coins = list()
 
-    for coin in values:
+    for coin in re.split(r"\s*,\s*", line[6:][:-1]):
         if match := re.match(r"(\d+)c", coin):
             value = int(match.group(1))
             if value in [1,2,5,10,20,50]:
@@ -113,6 +112,7 @@ def numero(line):
                 print(f"maq: 'saldo = {get_saldo_str()}'")
             else:
                 print("maq: 'Saldo insuficiente!'")
+
         elif re.match(r"800", number):
             print(f"maq: 'saldo = {get_saldo_str()}'")
 
