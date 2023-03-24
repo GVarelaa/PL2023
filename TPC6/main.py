@@ -20,7 +20,6 @@ tokens = (
     'WHILE',
     'FOR',
     'IN',
-    'LIST',
     'OP',
     'COMP',
     'ASSIGN',
@@ -61,65 +60,75 @@ def t_FUNC(t):
     r'\bfunction\b'
     return t
 
+
 def t_PROGRAM(t):
     r'\bprogram\b'
     return t
+
 
 def t_WHILE(t):
     r'\bwhile\b'
     return t
 
+
 def t_IF(t):
     r'\bif\b'
     return t
+
 
 def t_FOR(t):
     r'\bfor\b'
     return t
 
+
 def t_IN(t):
     r'\bin\b'
     return t
 
+
 def t_COMP(t):
     r'<=|>=|<|>'
     return t
+    
 
 def t_OPEN_COMMENT_MULTI_LINE(t):
     r'\/\*'
     t.lexer.begin('comment')
     return t
 
+
 def t_OPEN_COMMENT_LINE(t):
     r'\/\/'
     t.lexer.begin('comment')
     return t
+
     
 def t_comment_CLOSE_COMMENT_MULTI_LINE(t):
     r'\*\/'
     t.lexer.begin('INITIAL')
     return t
 
-def t_comment_COMMENT_LINE(t):
-    r'(?<=\/\/).*'
-    return t
 
 def t_comment_CLOSE_COMMENT_LINE(t):
     r'\n+'
     t.lexer.begin('INITIAL')
     return t
 
+
+def t_comment_COMMENT_LINE(t):
+    r'(?<=\/\/).*'
+    return t
+
+
 def t_comment_COMMENT_MULTI_LINE(t):
     r'(.|\n)*?(?=\*\/)'
     return t
 
-def t_ANY_newline(t):
-    r'\n+'
-    t.lexer.lineno += len(t.value)
 
 def t_ANY_error(t):
     print(f"Caracter ilegal: {t.value[0]}")
     t.lexer.skip(1)
+
 
 t_comment_ignore = ''
 t_INITIAL_ignore = ' \t\n'
